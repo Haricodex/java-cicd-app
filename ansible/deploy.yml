@@ -1,0 +1,19 @@
+- name: Deploy Java CI/CD Application to Minikube
+  hosts: local
+  gather_facts: false
+
+  tasks:
+    - name: Apply Kubernetes Deployment
+      command: kubectl apply -f ../k8s/deployment.yaml
+
+    - name: Apply Kubernetes Service
+      command: kubectl apply -f ../k8s/service.yaml
+
+    - name: Wait for deployment rollout
+      command: kubectl rollout status deployment/java-cicd-deployment --timeout=120s
+
+    - name: Verify Kubernetes pods
+      command: kubectl get pods
+
+    - name: Verify Kubernetes services
+      command: kubectl get services
