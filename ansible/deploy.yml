@@ -1,16 +1,17 @@
-- name: Deploy Java CI/CD Application to Minikube
-  hosts: local
+- name: Deploy Java CI/CD Application to Azure AKS
+  hosts: localhost
+  connection: local
   gather_facts: false
 
   tasks:
     - name: Apply Kubernetes Deployment
-      command: kubectl apply -f ../k8s/deployment.yaml
+      command: kubectl apply -f k8s/deployment.yaml
 
     - name: Apply Kubernetes Service
-      command: kubectl apply -f ../k8s/service.yaml
+      command: kubectl apply -f k8s/service.yaml
 
     - name: Wait for deployment rollout
-      command: kubectl rollout status deployment/java-cicd-deployment --timeout=120s
+      command: kubectl rollout status deployment/java-cicd-deployment --timeout=180s
 
     - name: Verify Kubernetes pods
       command: kubectl get pods
