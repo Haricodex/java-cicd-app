@@ -1,3 +1,4 @@
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -14,7 +15,7 @@ spec:
     spec:
       containers:
         - name: java-cicd-container
-          image: haridoc1006/java-cicd-app:latest
+          image: jvocicdregistry.azurecr.io/java-cicd-app:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8081
