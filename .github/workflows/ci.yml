@@ -1,11 +1,10 @@
-
 name: Java CI/CD Pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build-and-push:
@@ -47,3 +46,30 @@ jobs:
           tags: |
             jvocicdregistry.azurecr.io/java-cicd-app:latest
             jvocicdregistry.azurecr.io/java-cicd-app:${{ github.sha }}
+
+  deploy-to-aks:
+    needs: build-and-push
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Install Ansible
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ansible
+
+      - name: Configure AKS credentials
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 --decode > ~/.kube/config
+          chmod 600 ~/.kube/config
+
+      - name: Deploy application using Ansible
+        run: |
+          ansible-playbook -i localhost, -c local ansible/deploy.yml
