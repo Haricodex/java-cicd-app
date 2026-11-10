@@ -1,14 +1,27 @@
+
+---
 - name: Deploy Java CI/CD Application to Azure AKS
   hosts: localhost
   connection: local
   gather_facts: false
 
   tasks:
+    - name: Check Kubernetes manifest files
+      ansible.builtin.stat:
+        path: "{{ playbook_dir }}/../k8s/deployment.yaml"
+      register: deployment_file
+
+    - name: Verify deployment manifest exists
+      ansible.builtin.assert:
+        that:
+          - deployment_file.stat.exists
+        fail_msg: "deployment.yaml was not found in the k8s folder."
+
     - name: Apply Kubernetes Deployment
-      command: kubectl apply -f k8s/deployment.yaml
+      command: kubectl apply -f "{{ playbook_dir }}/../k8s/deployment.yaml"
 
     - name: Apply Kubernetes Service
-      command: kubectl apply -f k8s/service.yaml
+      command: kubectl apply -f "{{ playbook_dir }}/../k8s/service.yaml"
 
     - name: Wait for deployment rollout
       command: kubectl rollout status deployment/java-cicd-deployment --timeout=180s
